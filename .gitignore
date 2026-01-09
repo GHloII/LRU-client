@@ -1,0 +1,39 @@
+# Gradle
+.gradle/
+build/
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+bin/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Packaged application
+dist/
+*.jar
+*.war
+*.ear
+
+# Gradle Wrapper
+!gradle/wrapper/gradle-wrapper.jar
+gradle-wrapper.jar
+
+# NetBeans
+nbproject/
+
+# Eclipse
+.metadata
+
+# Visual Studio Code
+.vscode/

@@ -1,0 +1,86 @@
+Минимальное «современное» Java desktop-приложение под Windows
+Gradle + JavaFX + (JAR) + jpackage (EXE)
+
+Что в проекте:
+- build.gradle / settings.gradle — сборка Gradle
+- src/main/java/app/MainApp.java — точка входа JavaFX
+- src/main/java/app/MainController.java — контроллер для FXML (обработчик кнопки)
+- src/main/resources/ui.fxml — разметка UI (надпись + кнопка)
+
+Что делает приложение:
+- Открывает окно
+- Показывает одну надпись
+- Показывает одну кнопку
+- По клику меняет текст надписи
+
+Почему это «правильно и современно»:
+1) Gradle
+   - стандартизирует сборку
+   - управляет зависимостями (в т.ч. JavaFX)
+   - одинаково работает на разных машинах
+
+2) JavaFX (вместо Swing)
+   - современная модель UI (scene graph)
+   - удобно стилизовать, удобно разделять UI/логику
+   - FXML позволяет держать верстку отдельно от кода
+
+3) jpackage
+   - официальный инструмент JDK
+   - делает Windows .exe-установщик/приложение
+   - может упаковать runtime внутрь (пользователю не нужна установленная Java)
+
+ВАЖНО про IDE-ошибки "javafx не найден" или "package mismatch":
+- JavaFX не входит в JDK (начиная с Java 11), он подтягивается Gradle-зависимостями.
+- Поэтому пока проект не импортирован как Gradle, IDE может подсвечивать импорты красным.
+- Решение: открыть папку как Gradle-проект и дождаться синхронизации.
+
+Требования:
+- JDK 17+ (именно JDK)
+
+Проверка в PowerShell:
+  java -version
+
+Как запустить в режиме разработки (самый простой путь):
+  .\gradlew.bat run
+
+Сборка JAR:
+  .\gradlew.bat clean jar
+Результат будет примерно тут:
+  build\libs\myapp-1.0.0.jar
+
+Упаковка в EXE через jpackage:
+  .\gradlew.bat clean jpackage
+
+Упаковка в MSI (инсталлятор) через jpackage:
+  .\gradlew.bat clean jpackage
+
+Два режима артефактов (чтобы debug перезаписывался, а release не затирался):
+1) DEBUG (портативная папка app-image для тестов; перезаписывается)
+  .\gradlew.bat packageDebug
+  Результат:
+    dist\debug\MyApp\
+  Запуск:
+    dist\debug\MyApp\MyApp.exe
+
+2) RELEASE (каждая сборка сохраняется отдельным файлом)
+  # PowerShell: значение версии лучше брать в кавычки
+  .\gradlew.bat -PappVersion="1.0.0" packageRelease
+  # Альтернатива для PowerShell (полностью отключить парсинг аргументов):
+  # .\gradlew.bat --% -PappVersion=1.0.0 packageRelease
+  Результат:
+    dist\releases\MyApp-1.0.0-YYYYMMDD-HHMMSS.msi
+
+Где искать результат:
+- Обычно Gradle (jlink plugin) кладёт результат в:
+  build\jpackage\
+Там будет .exe (инсталлятор или app-image, зависит от настроек).
+
+Дополнительно:
+- build\jpackage\ — "сырые" результаты jpackage (могут перезаписываться)
+- dist\debug\ — debug app-image (папка)
+- dist\releases\ — история релизных MSI (не перезаписываются)
+
+Как это работает «под капотом»:
+1) Gradle собирает проект и подтягивает JavaFX зависимости.
+2) Формируется модульный runtime (jlink plugin) + launcher.
+3) jpackage упаковывает runtime + твой код в формат Windows.
