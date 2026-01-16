@@ -32,7 +32,11 @@
                 <Label text="Входящие страницы (через запятую):" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                 <TextField fx:id="lruIncomingPagesField" text="1,2,3,4,1,2,5,1,2,3,4,5" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
             </GridPane>
-            <Button fx:id="sendLruButton" text="Отправить LRU запрос" onAction="#onSendLruButtonClick" maxWidth="Infinity"/>
+            <HBox spacing="10">
+                <Button fx:id="sendLruButton" text="Отправить LRU запрос" onAction="#onSendLruButtonClick" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="loadFromFileButton" text="Загрузить из файла" onAction="#onLoadFromFileButtonClick" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="saveToFileButton" text="Сохранить в файл" onAction="#onSaveToFileButtonClick" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            </HBox>
         </VBox>
     </TitledPane>
 

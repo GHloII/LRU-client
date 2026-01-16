@@ -3,15 +3,23 @@ package app.controller;
 import app.model.LruData;
 import app.service.TCPClient;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class MainController {
 
@@ -23,6 +31,8 @@ public class MainController {
     @FXML private TextField lruPagesInMemoryField;
     @FXML private TextField lruIncomingPagesField;
     @FXML private Button sendLruButton;
+    @FXML private Button loadFromFileButton;
+    @FXML private Button saveToFileButton;
 
     private Gson gson = new Gson();
 
@@ -72,6 +82,86 @@ public class MainController {
 
 
     @FXML
+    private void onSaveToFileButtonClick() {
+        try {
+            // Парсим введенные данные
+            int pagesInMemory = Integer.parseInt(lruPagesInMemoryField.getText().trim());
+            int[] incomingPages = Arrays.stream(lruIncomingPagesField.getText().split(","))
+                                     .map(String::trim)
+                                     .filter(s -> !s.isEmpty())
+                                     .mapToInt(Integer::parseInt)
+                                     .toArray();
+
+            // Создаем объект для сериализации
+            LruData data = new LruData(pagesInMemory, incomingPages);
+
+            // Настраиваем FileChooser
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Сохранить настройки LRU");
+            fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("JSON Files", "*.json")
+            );
+            
+            // Устанавливаем начальное имя файла
+            fileChooser.setInitialFileName("lru_settings.json");
+            
+            // Показываем диалог сохранения
+            File file = fileChooser.showSaveDialog(logArea.getScene().getWindow());
+            
+            if (file != null) {
+                // Сериализуем в JSON и сохраняем в файл
+                try (FileWriter writer = new FileWriter(file)) {
+                    gson.toJson(data, writer);
+                    logArea.appendText("Настройки успешно сохранены в файл: " + file.getName() + "\n");
+                }
+            }
+        } catch (NumberFormatException e) {
+            logArea.appendText("Ошибка: Проверьте правильность введенных данных. " +
+                             "Количество страниц должно быть числом, а последовательность - числами через запятую.\n");
+        } catch (IOException e) {
+            logArea.appendText("Ошибка при сохранении файла: " + e.getMessage() + "\n");
+        } catch (Exception e) {
+            logArea.appendText("Неизвестная ошибка при сохранении: " + e.getMessage() + "\n");
+        }
+    }
+
+    @FXML
+    private void onLoadFromFileButtonClick() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Выберите JSON файл с данными LRU");
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("JSON Files", "*.json")
+        );
+        File selectedFile = fileChooser.showOpenDialog(logArea.getScene().getWindow());
+
+        if (selectedFile != null) {
+            try (FileReader reader = new FileReader(selectedFile)) {
+                LruData data = gson.fromJson(reader, LruData.class);
+
+                if (data == null || data.array_of_incoming_pages() == null) {
+                     logArea.appendText("Ошибка: Неверный формат JSON. Ожидались поля 'amount_of_pages_in_memory' и 'array_of_incoming_pages'.\n");
+                     return;
+                }
+
+                lruPagesInMemoryField.setText(String.valueOf(data.amount_of_pages_in_memory()));
+                String pages = Arrays.stream(data.array_of_incoming_pages())
+                                     .mapToObj(String::valueOf)
+                                     .collect(Collectors.joining(", "));
+                lruIncomingPagesField.setText(pages);
+
+                logArea.appendText("Данные успешно загружены из файла: " + selectedFile.getName() + "\n");
+
+            } catch (IOException e) {
+                logArea.appendText("Ошибка чтения файла: " + e.getMessage() + "\n");
+            } catch (JsonSyntaxException e) {
+                logArea.appendText("Ошибка парсинга JSON: Файл не является корректным JSON. " + e.getMessage() + "\n");
+            } catch (Exception e) {
+                logArea.appendText("Произошла непредвиденная ошибка: " + e.getMessage() + "\n");
+            }
+        }
+    }
+
+    @FXML
     private void onSendLruButtonClick() {
         if (tcpClient == null || !tcpClient.isRunning()) {
             logArea.appendText("Ошибка: вы не подключены к серверу.\n");
@@ -105,6 +195,8 @@ public class MainController {
 
     private void setControlsDisabled(boolean disabled) {
         sendLruButton.setDisable(disabled);
+        loadFromFileButton.setDisable(disabled);
+        saveToFileButton.setDisable(disabled);
         lruPagesInMemoryField.setDisable(disabled);
         lruIncomingPagesField.setDisable(disabled);
     }
