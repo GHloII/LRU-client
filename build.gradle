@@ -18,10 +18,15 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation 'com.google.code.gson:gson:2.10.1'
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+    modularity.inferModulePath = true
 }
 
 application {
@@ -33,6 +38,8 @@ javafx {
     version = '21.0.2'
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
+
+
 
 jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']

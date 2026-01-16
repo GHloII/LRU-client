@@ -3,7 +3,7 @@ package app.model;
 public enum WindowMode {
     // Определяем константы и передаем значения в конструктор
     FULLSCREEN(0, 0), // Размеры для полноэкранного режима обычно определяются динамически
-    WINDOWED(600, 300),
+    WINDOWED(800, 600),
     BORDERLESS(400, 200);
 
     private final int width;
