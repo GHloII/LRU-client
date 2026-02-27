@@ -8,7 +8,7 @@ Gradle + JavaFX + (JAR) + jpackage (EXE)
 - src/main/resources/ui.fxml — разметка UI (надпись + кнопка)
 
 Требования:
-- JDK 17+ (именно JDK)
+- JDK 17+ 
 
 Проверка в PowerShell:
   java -version
