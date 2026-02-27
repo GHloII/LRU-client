@@ -2,7 +2,7 @@
 
 Минимальное современное Java desktop-приложение под Windows
 Gradle + JavaFX + (JAR) + jpackage (EXE)
-
+![alt text](image.png)
 ## Быстрый запуск
 
 ### Рекомендуемый способ (первый запуск):
