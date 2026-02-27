@@ -84,7 +84,6 @@ public class MainController {
     @FXML
     private void onSaveToFileButtonClick() {
         try {
-            // Парсим введенные данные
             int pagesInMemory = Integer.parseInt(lruPagesInMemoryField.getText().trim());
             int[] incomingPages = Arrays.stream(lruIncomingPagesField.getText().split(","))
                                      .map(String::trim)
@@ -92,24 +91,19 @@ public class MainController {
                                      .mapToInt(Integer::parseInt)
                                      .toArray();
 
-            // Создаем объект для сериализации
             LruData data = new LruData(pagesInMemory, incomingPages);
 
-            // Настраиваем FileChooser
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Сохранить настройки LRU");
             fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("JSON Files", "*.json")
             );
             
-            // Устанавливаем начальное имя файла
             fileChooser.setInitialFileName("lru_settings.json");
             
-            // Показываем диалог сохранения
             File file = fileChooser.showSaveDialog(logArea.getScene().getWindow());
             
             if (file != null) {
-                // Сериализуем в JSON и сохраняем в файл
                 try (FileWriter writer = new FileWriter(file)) {
                     gson.toJson(data, writer);
                     logArea.appendText("Настройки успешно сохранены в файл: " + file.getName() + "\n");
@@ -207,7 +201,6 @@ public class MainController {
         }
 
         try {
-            // Определяем паттерны для извлечения значений
             Pattern interruptionsPattern = Pattern.compile("interuptions=(\\d+)");
             Pattern pagesPattern = Pattern.compile("amount_of_pages_in_memory=(\\d+)");
             Pattern arrayPattern = Pattern.compile("resultArray=(\\[.*\\])");
@@ -225,7 +218,7 @@ public class MainController {
 
         } catch (Exception e) {
             logArea.appendText("Ошибка парсинга ответа от сервера: " + e.getMessage() + "\n");
-            return message; // Возвращаем исходное сообщение в случае ошибки
+            return message;
         }
     }
 }

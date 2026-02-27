@@ -57,8 +57,6 @@ jlink {
                 '--win-menu',
                 '--win-shortcut'
         ]
-        // icon = 'src/main/resources/icon.ico'
-        // vendor = 'My Company'
     }
 }
 

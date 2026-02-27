@@ -75,7 +75,6 @@ public class TCPClient extends Service<Void> {
                 socket.close();
             }
         } catch (IOException e) {
-            // Игнорируем
         }
         cancel();
     }

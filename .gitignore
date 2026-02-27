@@ -26,7 +26,6 @@ dist/
 *.ear
 
 # Gradle Wrapper
-!gradle/wrapper/gradle-wrapper.jar
 gradle-wrapper.jar
 
 # NetBeans
